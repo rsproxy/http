@@ -1,4 +1,11 @@
 [package]
 name = "raproxy-http"
+description = "Simple library to parse http request and response headers to be used by rsproxy."
+documentation = "https://github.com/rsproxy/http"
+homepage = "https://github.com/rsproxy/http"
+repository = "https://github.com/rsproxy/http"
+readme = "README.md"
+keywords = ["http", "parser", "proxy"]
+license = "GPL-3.0"
 version = "0.1.0"
 authors = ["Edwin Fuquen <efuquen@gmail.com>"]

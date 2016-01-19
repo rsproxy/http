@@ -18,13 +18,6 @@ enum HttpMethod {
 
 #[derive(Debug)]
 #[derive(PartialEq)]
-enum HttpVersion {
-    One,
-    OnePointOne,
-}
-
-#[derive(Debug)]
-#[derive(PartialEq)]
 enum HttpHeaderName {
     Accept,
     AcceptCharset,
@@ -85,19 +78,9 @@ impl HttpHeader {
     }
 }
 
-struct HttpStatus {
-    code:   u16,
-    reason: String
-}
-
 struct HttpRequest {
     method:  HttpMethod,
     uri:     String,
-    headers: Vec<HttpHeader>
-}
-
-struct HttpResponse {
-    status: HttpStatus,
     headers: Vec<HttpHeader>
 }
 
