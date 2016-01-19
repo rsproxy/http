@@ -5,7 +5,7 @@ use std::convert::AsRef;
 
 #[derive(Debug)]
 #[derive(PartialEq)]
-enum HttpMethod {
+pub enum HttpMethod {
     Options,
     Get,
     Header,
@@ -18,33 +18,40 @@ enum HttpMethod {
 
 #[derive(Debug)]
 #[derive(PartialEq)]
-enum HttpHeaderName {
+pub enum HttpHeaderName {
     Accept,
     AcceptCharset,
     AcceptEncoding,
     Host,
     Referer,
-    UserAgent
+    UserAgent,
+    Custom(String)
 }
 
-struct HttpHeader {
+#[derive(Debug)]
+#[derive(PartialEq)]
+pub struct HttpHeader {
     name:  HttpHeaderName,
     value: String
 }
 
 trait HttpHeaderSplitTrim {
     fn split_trim(&self, pattern: &str) -> Vec<&str>;
+    fn splitn_trim(&self, n: usize, pattern: &str) -> Vec<&str>;
 }
 
 impl HttpHeaderSplitTrim for str {
     fn split_trim(&self, pattern: &str) -> Vec<&str> {
-        self.splitn(2, pattern).map(|s| s.trim()).collect()
+        self.split(pattern).map(|s| s.trim()).collect()
+    }
+    fn splitn_trim(&self, n: usize, pattern: &str) -> Vec<&str> {
+        self.splitn(n, pattern).map(|s| s.trim()).collect()
     }
 }
 
 impl HttpHeader {
-    fn new(line: &str) -> Result<HttpHeader, String> {
-        let parts = line.split_trim(":");
+    pub fn new(line: &str) -> Result<HttpHeader, String> {
+        let parts = line.splitn_trim(2, ":");
         if parts.len() != 2 {
             return Err(
                 format!("Too many parts after line split: {}", parts.len()))
@@ -73,23 +80,27 @@ impl HttpHeader {
         } else if name == "referer" {
             build_request(HttpHeaderName::Referer, value)
         } else {
-            Result::Err(format!("Unknown request name: {}", parts[0]))
+            build_request(HttpHeaderName::Custom(parts[0].to_string()), value)
         }
     }
 }
 
-struct HttpRequest {
+#[derive(Debug)]
+#[derive(PartialEq)]
+pub struct HttpRequest {
     method:  HttpMethod,
     uri:     String,
     headers: Vec<HttpHeader>
 }
 
 impl HttpRequest {
-    fn new(header: &str) -> Result<HttpRequest, String> {
+    pub fn new(header: &str) -> Result<HttpRequest, String> {
+        println!("header: {:?}", header);
         let lines = header.split_trim("\r\n");
         if lines.len() == 0 {
             return Result::Err(format!("No CRLF in request: {}", header))
         }
+        println!("{:?}", lines);
         let request_line: Vec<&str> = lines[0].split_whitespace().collect();
         let method = match request_line[0].to_ascii_lowercase().as_ref() {
             "options" => HttpMethod::Options,
@@ -151,7 +162,8 @@ mod tests {
             #[test]
     fn http_get_request() {
         let get_request_str = "GET /some/path HTTP/1.1\r\n\
-                               Host: http://rsproxy.com\r\n";
+                               Host: http://rsproxy.com\r\n\
+                               Accept: text/html\r\n";
         let get_request = HttpRequest::new(get_request_str).unwrap();
         assert_eq!(HttpMethod::Get, get_request.method);
         assert_eq!("/some/path", get_request.uri);
@@ -160,3 +172,4 @@ mod tests {
         assert_eq!("http://rsproxy.com", host_header.value);
     }
 }
+

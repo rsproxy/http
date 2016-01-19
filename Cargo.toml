@@ -1,5 +1,5 @@
 [package]
-name = "raproxy-http"
+name = "rshttp"
 description = "Simple library to parse http request and response headers to be used by rsproxy."
 documentation = "https://github.com/rsproxy/http"
 homepage = "https://github.com/rsproxy/http"
