@@ -95,12 +95,10 @@ pub struct HttpRequest {
 
 impl HttpRequest {
     pub fn new(header: &str) -> Result<HttpRequest, String> {
-        println!("header: {:?}", header);
         let lines = header.split_trim("\r\n");
         if lines.len() == 0 {
             return Result::Err(format!("No CRLF in request: {}", header))
         }
-        println!("{:?}", lines);
         let request_line: Vec<&str> = lines[0].split_whitespace().collect();
         let method = match request_line[0].to_ascii_lowercase().as_ref() {
             "options" => HttpMethod::Options,
