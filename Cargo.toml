@@ -1,0 +1,4 @@
+[package]
+name = "raproxy-http"
+version = "0.1.0"
+authors = ["Edwin Fuquen <efuquen@gmail.com>"]
